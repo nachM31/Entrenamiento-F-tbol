@@ -17,567 +17,230 @@
     --ink: #06120c;
     --line: rgba(244,241,230,0.16);
   }
-
   *{ box-sizing: border-box; margin:0; padding:0; }
-
   html{ scroll-behavior: smooth; }
 
-  /* Full-page pitch background and decorative items */
+  /* Full-page stadium background (real image) */
   body{
     font-family: 'Barlow', sans-serif;
     color: var(--chalk);
     overflow-x: hidden;
-    position: relative;
-    background: none; /* moved to #pitch-bg */
+    background: var(--ink);
   }
 
-  /* Fixed pitch layer covering whole viewport */
-  #pitch-bg{
+  /* Fixed background image showing a stadium behind the pitch */
+  #stadium-bg{
     position: fixed;
     inset: 0;
     z-index: 0;
-    background-color: var(--pitch);
-    background-image: 
-      linear-gradient(180deg, rgba(10,44,25,0.04) 0%, rgba(10,44,25,0.04) 100%),
-      repeating-linear-gradient(90deg, rgba(244,241,230,0.02) 0 100px, transparent 100px 200px);
-    /* subtle vignette */
-    box-shadow: inset 0 120px 160px rgba(4,16,11,0.6), inset 0 -120px 160px rgba(4,16,11,0.6);
+    background-image: linear-gradient(rgba(6,12,8,0.62), rgba(6,12,8,0.62)), url('https://images.unsplash.com/photo-1509395176047-4a66953fd231?auto=format&fit=crop&w=1920&q=80');
+    background-size: cover;
+    background-position: center center;
+    filter: saturate(0.95) contrast(0.9);
     pointer-events: none;
   }
 
-  /* Container that will hold cones and balls positioned along the page height */
-  #decor-container{
-    position: absolute; /* height will be set by JS to match document height */
-    top: 0;
+  /* Green pitch layer in front of stadium image */
+  #pitch-layer{
+    position: fixed;
     left: 0;
-    width: 100%;
-    z-index: 1; /* behind main content which uses higher z-indexes */
+    right: 0;
+    bottom: 0;
+    height: 48vh; /* visible pitch area */
+    z-index: 1;
+    background: linear-gradient(180deg, rgba(15,61,36,0.98) 0%, rgba(10,44,25,0.96) 100%);
+    box-shadow: inset 0 40px 90px rgba(3,10,6,0.6), inset 0 -40px 90px rgba(3,10,6,0.6);
+    background-size: 100% 100%;
     pointer-events: none;
   }
 
-  .decor-item{
-    position: absolute;
-    transform-origin: center;
-    opacity: 0.95;
-    filter: drop-shadow(0 6px 10px rgba(0,0,0,0.45));
-    will-change: transform, top, left;
-  }
-
-  .decor-item.cone svg{ width: 64px; height: 64px; }
-  .decor-item.ball svg{ width: 56px; height: 56px; }
-
-  /* Ensure content layers sit above decor */
-  .hero, .section, .cta-section, footer{ position: relative; z-index: 3; }
-
-  h1, h2, .eyebrow, .stat-num{
-    font-family: 'Anton', sans-serif;
-    letter-spacing: 0.5px;
-  }
-
-  /* ---------- HERO / STADIUM ---------- */
-  .hero{
-    position: relative;
-    min-height: 100svh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-    background: radial-gradient(120% 90% at 50% 12%, #0f3d24 0%, #0a2c19 38%, #071a12 68%, #04100b 100%);
-  }
-
-  .hero svg{
+  /* real grass stripes overlay */
+  #pitch-layer::after{
+    content: '';
     position: absolute;
     inset: 0;
-    width: 100%;
-    height: 100%;
+    background-image: repeating-linear-gradient(90deg, rgba(244,241,230,0.02) 0 120px, transparent 120px 240px);
+    opacity: 0.9;
   }
 
-  .hero-glow{
-    position: absolute;
-    top: -10%;
+  /* Sticky header with site title (simple domain-like) */
+  .site-header{
+    position: fixed;
+    top: 16px;
     left: 50%;
     transform: translateX(-50%);
-    width: 140%;
-    height: 60%;
-    background: radial-gradient(ellipse at center, rgba(255,210,63,0.16) 0%, rgba(255,210,63,0) 65%);
-    pointer-events: none;
-  }
-
-  .hero-content{
-    position: relative;
     z-index: 4;
-    text-align: center;
-    padding: 32px 24px;
-    max-width: 720px;
-  }
-
-  .panel{
-    background: rgba(6,18,12,0.52);
-    backdrop-filter: blur(3px);
-    border: 1px solid rgba(244,241,230,0.14);
-    border-radius: 18px;
-    padding: 40px 32px;
-  }
-
-  .eyebrow{
-    display:inline-block;
-    font-size: clamp(1.3rem, 3.2vw, 2rem);
-    color: var(--floodlight);
-    text-transform: none;
-    margin-bottom: 10px;
-    animation: fadeUp 0.9s ease both;
-  }
-
-  h1.title{
-    font-size: clamp(2.6rem, 8.5vw, 5rem);
-    line-height: 0.98;
-    text-transform: uppercase;
-    color: var(--chalk);
-    text-shadow: 0 6px 30px rgba(0,0,0,0.55);
-    animation: fadeUp 1s 0.15s ease both;
-  }
-
-  .title .accent{ color: var(--floodlight); }
-
-  .hero-sub{
-    margin-top: 18px;
-    font-size: clamp(0.95rem, 2vw, 1.15rem);
-    color: rgba(244,241,230,0.78);
-    font-weight: 500;
-    animation: fadeUp 1s 0.3s ease both;
-  }
-
-  .scroll-cue{
-    position: absolute;
-    bottom: 26px;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 3;
-    width: 22px;
-    height: 34px;
-    border: 2px solid rgba(244,241,230,0.5);
-    border-radius: 12px;
-  }
-  .scroll-cue::after{
-    content:"";
-    position: absolute;
-    top: 6px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 4px;
-    height: 8px;
-    border-radius: 2px;
-    background: var(--floodlight);
-    animation: scrollDot 1.6s infinite ease;
-  }
-
-  @keyframes scrollDot{
-    0%{ opacity: 1; top: 6px; }
-    70%{ opacity: 0; top: 18px; }
-    100%{ opacity: 0; top: 6px; }
-  }
-
-  @keyframes fadeUp{
-    from{ opacity: 0; transform: translateY(16px); }
-    to{ opacity: 1; transform: translateY(0); }
-  }
-
-  @media (prefers-reduced-motion: reduce){
-    *{ animation: none !important; }
-  }
-
-  /* ---------- CONTENT ---------- */
-  .section{
-    position: relative;
-    padding: 80px 24px;
-    background: var(--ink);
-  }
-
-  .section::before{
-    content:"";
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, var(--line), transparent);
-  }
-
-  .wrap{
-    max-width: 760px;
-    margin: 0 auto;
-  }
-
-  .kicker{
-    font-family: 'Barlow Condensed', sans-serif;
-    font-weight: 700;
-    letter-spacing: 3px;
-    text-transform: uppercase;
-    color: var(--floodlight);
-    font-size: 0.85rem;
-    margin-bottom: 14px;
-  }
-
-  .lead{
-    font-size: clamp(1.05rem, 2.2vw, 1.3rem);
-    line-height: 1.55;
-    color: rgba(244,241,230,0.9);
-    margin-bottom: 32px;
-  }
-
-  .tags{
-    display: flex;
-    flex-wrap: wrap;
-    gap: 12px;
-    margin-bottom: 36px;
-  }
-
-  .tag{
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    background: rgba(255,210,63,0.07);
-    border: 1px solid rgba(255,210,63,0.35);
-    color: var(--chalk);
+    background: rgba(6,12,9,0.28);
+    backdrop-filter: blur(6px);
+    border: 1px solid rgba(244,241,230,0.06);
     padding: 10px 18px;
-    border-radius: 999px;
-    font-weight: 600;
-    font-size: 0.95rem;
-  }
-
-  .tag .dot{
-    width: 8px; height: 8px;
-    border-radius: 50%;
-    background: var(--floodlight);
-    flex-shrink: 0;
-  }
-
-  .quote{
-    border-left: 3px solid var(--floodlight);
-    padding: 6px 0 6px 22px;
-    font-family: 'Barlow Condensed', sans-serif;
-    font-weight: 600;
-    font-size: clamp(1.2rem, 3vw, 1.6rem);
-    line-height: 1.3;
-    color: var(--chalk);
-  }
-
-  /* ---------- DAYS ---------- */
-  .days-section{
-    background: linear-gradient(180deg, var(--ink) 0%, #0a1a12 100%);
-  }
-
-  .days-grid{
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0,1fr));
-    gap: 18px;
-    max-width: 480px;
-    margin: 0 auto;
-  }
-
-  .day-card{
-    position: relative;
-    background: var(--pitch-dark);
-    border: 1px solid var(--line);
-    border-radius: 16px;
-    padding: 28px 18px;
+    border-radius: 14px;
     text-align: center;
-    overflow: hidden;
+    pointer-events: auto;
   }
+  .site-header h1{ font-family: 'Anton', sans-serif; font-size: 1.4rem; margin-bottom: 2px; }
+  .site-header p{ font-size: 0.9rem; color: rgba(244,241,230,0.82); margin:0; }
 
-  .day-card::after{
-    content:"";
-    position: absolute;
-    inset: 0;
-    background:
-      repeating-linear-gradient(90deg, rgba(244,241,230,0.035) 0 2px, transparent 2px 26px);
+  /* Main content sits above decorative layers */
+  main{ position: relative; z-index: 3; }
+
+  /* Hero area: keep content readable and fixed layout */
+  .hero{ min-height: 60vh; display:flex; align-items:center; justify-content:center; padding-top:110px; }
+  .panel{ background: rgba(6,18,12,0.64); backdrop-filter: blur(4px); border-radius: 18px; padding: 28px 32px; border: 1px solid rgba(244,241,230,0.08); }
+  h2.hero-title{ font-family: 'Anton', sans-serif; font-size: 3rem; color: var(--chalk); letter-spacing: 1px; text-transform: uppercase; }
+  .hero-sub{ margin-top:8px; color: rgba(244,241,230,0.86); font-weight:500; }
+
+  /* Ball actor that moves across the pitch */
+  .ball-actor{
+    position: fixed;
+    z-index: 2;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 56px; height: 56px;
+    pointer-events: none;
+    transition: transform 1.6s cubic-bezier(.2,.8,.2,1), left 1.6s cubic-bezier(.2,.8,.2,1), top 1.6s cubic-bezier(.2,.8,.2,1);
+  }
+  .ball-actor svg{ width:100%; height:100%; display:block; }
+
+  /* WhatsApp button with reflective contour */
+  .wa-button{
+    display: inline-flex; align-items:center; gap:12px; background: var(--floodlight); color: var(--ink);
+    font-family: 'Anton', sans-serif; font-size: 1rem; padding: 14px 26px; border-radius: 999px; position: relative; overflow: hidden; text-decoration:none;
+    box-shadow: 0 10px 30px rgba(255,210,63,0.25);
+  }
+  .wa-button:focus-visible{ outline:3px solid var(--chalk); outline-offset:3px; }
+
+  /* reflective contour using pseudo-element */
+  .wa-button::before{
+    content: '';
+    position: absolute; inset: -2px; border-radius: inherit; padding:2px;
+    background: linear-gradient(90deg, rgba(255,255,255,0.0) 0%, rgba(255,255,255,0.12) 20%, rgba(255,255,255,0.0) 40%, rgba(255,255,255,0.08) 60%, rgba(255,255,255,0.0) 100%);
+    -webkit-mask: linear-gradient(#fff 0 0);
+    transform: translateX(-120%);
+    animation: reflect 2s linear infinite;
     pointer-events: none;
   }
+  @keyframes reflect{ to{ transform: translateX(120%); } }
 
-  .day-name{
-    font-family: 'Anton', sans-serif;
-    font-size: 1.5rem;
-    text-transform: uppercase;
-    color: var(--floodlight);
-    letter-spacing: 1px;
-  }
+  footer{ text-align:center; padding:28px; color: rgba(244,241,230,0.5); }
 
-  .day-label{
-    margin-top: 6px;
-    font-size: 0.85rem;
-    color: rgba(244,241,230,0.6);
-    text-transform: uppercase;
-    letter-spacing: 2px;
-  }
-
-  /* ---------- CTA ---------- */
-  .cta-section{
-    padding: 90px 24px 100px;
-    text-align: center;
-    background: radial-gradient(90% 120% at 50% 100%, #0f3d24 0%, #071a12 55%, #04100b 100%);
-  }
-
-  .cta-title{
-    font-size: clamp(1.6rem, 4.5vw, 2.4rem);
-    text-transform: uppercase;
-    margin-bottom: 14px;
-  }
-
-  .cta-sub{
-    color: rgba(244,241,230,0.72);
-    margin-bottom: 34px;
-    font-size: 1.05rem;
-  }
-
-  .wa-button{
-    display: inline-flex;
-    align-items: center;
-    gap: 12px;
-    background: var(--floodlight);
-    color: var(--ink);
-    font-family: 'Anton', sans-serif;
-    font-size: 1.15rem;
-    letter-spacing: 1px;
-    text-decoration: none;
-    padding: 18px 40px;
-    border-radius: 999px;
-    box-shadow: 0 10px 30px rgba(255,210,63,0.25);
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-  }
-
-  .wa-button:hover{
-    transform: translateY(-3px);
-    box-shadow: 0 14px 36px rgba(255,210,63,0.35);
-  }
-
-  .wa-button:focus-visible{
-    outline: 3px solid var(--chalk);
-    outline-offset: 3px;
-  }
-
-  .wa-button svg{ width: 24px; height: 24px; flex-shrink: 0; }
-
-  footer{
-    text-align: center;
-    padding: 26px;
-    font-size: 0.8rem;
-    color: rgba(244,241,230,0.35);
-    background: var(--ink);
-    position: relative;
-    z-index: 3;
-  }
-
-  @media (max-width: 480px){
-    .panel{ padding: 30px 20px; }
-    .days-grid{ grid-template-columns: 1fr 1fr; gap: 12px; }
-
-    .decor-item.cone svg{ width: 46px; height: 46px; }
-    .decor-item.ball svg{ width: 40px; height: 40px; }
+  /* small screens tweaks */
+  @media (max-width:600px){
+    h2.hero-title{ font-size:1.8rem; }
+    .site-header{ padding:8px 12px; top:8px; }
+    .ball-actor{ width:40px; height:40px; }
   }
 </style>
 </head>
 <body>
 
-<!-- Full-page pitch background layer -->
-<div id="pitch-bg" aria-hidden="true"></div>
+<!-- Background layers -->
+<div id="stadium-bg" aria-hidden="true"></div>
+<div id="pitch-layer" aria-hidden="true"></div>
 
-<!-- Decorative container: cones and balls will be placed here by JS -->
-<div id="decor-container" aria-hidden="true"></div>
+<!-- Sticky simple header (domain-like, minimal) -->
+<header class="site-header" role="banner">
+  <h1>Entrenamiento de Fútbol</h1>
+  <p>Entrenamiento de fútbol — Martes y Jueves</p>
+</header>
 
-<section class="hero">
-  <svg viewBox="0 0 1200 900" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
-    <defs>
-      <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%" stop-color="#0a2c19"/>
-        <stop offset="100%" stop-color="#071a12"/>
-      </linearGradient>
-      <radialGradient id="lightBeam" cx="50%" cy="0%" r="75%">
-        <stop offset="0%" stop-color="#ffd23f" stop-opacity="0.28"/>
-        <stop offset="100%" stop-color="#ffd23f" stop-opacity="0"/>
-      </radialGradient>
-    </defs>
+<main>
+  <section class="hero">
+    <div class="panel" aria-live="polite">
+      <h2 class="hero-title">Entrenamiento de Fútbol</h2>
+      <p class="hero-sub">Trabajá en tu técnica y tus capacidades. Inscripciones abiertas.</p>
+      <div style="margin-top:16px; display:flex; justify-content:center; gap:12px;">
+        <a class="wa-button" href="https://wa.me/5492302351010?text=Hola%20quiero%20%2B%20info%20de%20la%20actividad" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M17.472 14.382c-.297-.148-1.758-.866-2.03-.966-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.149-1.255-.462-2.39-1.475-.885-.786-1.48-1.754-1.653-2.051-.173-.296-.018-.456.13-.604.134-.133.297-.347.446-.52.151-.174.201-.297.302-.496.099-.2.05-.373-.025-.521-.075-.148-.67-1.616-.92-2.214-.243-.577-.488-.498-.67-.507l-.57-.01c-.197 0-.52.075-.792.373-.273.297-1.04 1.016-1.04 2.479 0 1.462 1.064 2.878 1.213 3.078.148.2 2.095 3.2 5.077 4.487 2.982 1.287 2.982.857 3.517.804.535-.05 1.744-.711 1.99-1.396.248-.686.248-1.274.173-1.397-.074-.123-.272-.198-.57-.347z"/></svg>
+          Más info
+        </a>
+      </div>
+    </div>
+  </section>
 
-    <rect width="1200" height="900" fill="url(#sky)"/>
+  <section style="padding:40px 20px 120px;">
+    <div style="max-width:760px; margin:0 auto; color:rgba(244,241,230,0.92);">
+      <p style="font-size:1.05rem; line-height:1.6;">Entrenamientos pensados para que juegues mejor de verdad: trabajo técnico, físico y táctico en cada entreno. Las plazas son limitadas.</p>
+      <div style="margin-top:18px; display:flex; gap:12px; flex-wrap:wrap;">
+        <span style="background:rgba(255,210,63,0.08); padding:8px 14px; border-radius:999px; border:1px solid rgba(255,210,63,0.25);">A partir de 12 años</span>
+        <span style="background:rgba(255,210,63,0.08); padding:8px 14px; border-radius:999px; border:1px solid rgba(255,210,63,0.25);">Masculino y femenino</span>
+      </div>
+    </div>
+  </section>
 
-    <!-- Grandstand silhouette (upper tier, dot-matrix lights) -->
-    <g opacity="0.9">
-      <path d="M0,230 Q600,140 1200,230 L1200,300 Q600,215 0,300 Z" fill="#04100b"/>
-    </g>
-    <g fill="#f4f1e6" opacity="0.25">
-      <!-- rows of stadium lights, generated as dot grid -->
-      <g id="dotsrow"></g>
-    </g>
+  <section style="padding:40px 20px 220px;">
+    <div style="max-width:760px; margin:0 auto; color:rgba(244,241,230,0.86);">
+      <h3 style="font-family:'Anton',sans-serif; letter-spacing:1px;">Días de entrenamiento</h3>
+      <div style="display:grid; grid-template-columns:repeat(2,1fr); gap:12px; margin-top:12px; max-width:480px;">
+        <div style="background:rgba(6,18,12,0.6); padding:18px; border-radius:12px;">Martes — Entrenamiento</div>
+        <div style="background:rgba(6,18,12,0.6); padding:18px; border-radius:12px;">Jueves — Entrenamiento</div>
+      </div>
+    </div>
+  </section>
+</main>
 
-    <!-- Floodlight beams -->
-    <rect x="0" y="0" width="1200" height="500" fill="url(#lightBeam)"/>
-
-    <!-- Second stand tier -->
-    <path d="M0,300 Q600,215 1200,300 L1200,360 Q600,285 0,360 Z" fill="#06180f" opacity="0.95"/>
-
-    <!-- Pitch -->
-    <rect x="0" y="360" width="1200" height="540" fill="#0f3d24"/>
-    <rect x="0" y="360" width="1200" height="540" fill="#1a5c37" opacity="0.15"/>
-
-    <!-- mowed stripes -->
-    <g opacity="0.12">
-      <rect x="0" y="360" width="100" height="540" fill="#f4f1e6"/>
-      <rect x="200" y="360" width="100" height="540" fill="#f4f1e6"/>
-      <rect x="400" y="360" width="100" height="540" fill="#f4f1e6"/>
-      <rect x="600" y="360" width="100" height="540" fill="#f4f1e6"/>
-      <rect x="800" y="360" width="100" height="540" fill="#f4f1e6"/>
-      <rect x="1000" y="360" width="100" height="540" fill="#f4f1e6"/>
-    </g>
-
-    <!-- pitch markings (perspective) -->
-    <g stroke="#f4f1e6" stroke-opacity="0.35" stroke-width="3" fill="none">
-      <path d="M120,900 L120,430 Q600,400 1080,430 L1080,900"/>
-      <path d="M600,400 L600,900" />
-      <ellipse cx="600" cy="650" rx="140" ry="60"/>
-      <path d="M340,900 Q600,830 860,900" />
+<!-- Ball actor (moves across visible pitch area) -->
+<div class="ball-actor" id="ball-actor" aria-hidden="true">
+  <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="32" cy="32" r="28" fill="#fff" stroke="#000" stroke-width="1.5"/>
+    <g fill="#000">
+      <circle cx="32" cy="18" r="4"/>
+      <circle cx="22" cy="34" r="3.6"/>
+      <circle cx="44" cy="34" r="3.6"/>
+      <circle cx="32" cy="46" r="3.6"/>
     </g>
   </svg>
+</div>
 
-  <div class="hero-glow"></div>
-
-  <div class="hero-content">
-    <div class="panel">
-      <span class="eyebrow">¿Querés mejorar?</span>
-      <h1 class="title">Entrenamiento<br>de <span class="accent">Fútbol</span></h1>
-      <p class="hero-sub">Trabajá en tu técnica y tus capacidades.</p>
-    </div>
-  </div>
-
-  <div class="scroll-cue" aria-hidden="true"></div>
-</section>
-
-<section class="section">
-  <div class="wrap">
-    <p class="lead quote">
-      Entrenamientos pensados para que juegues mejor de verdad: trabajo técnico, físico y táctico en cada entreno.
-    </p>
-    <div class="tags">
-      <span class="tag"><span class="dot"></span>A partir de 12 años</span>
-      <span class="tag"><span class="dot"></span>Masculino y femenino</span>
-    </div>
-    <p class="quote">Mejorá tu técnica individual, tus capacidades físicas, mejorá tu juego.</p>
-  </div>
-</section>
-
-<section class="section days-section">
-  <div class="wrap">
-    <p class="kicker">Días de entrenamiento</p>
-    <div class="days-grid">
-      <div class="day-card">
-        <div class="day-name">Martes</div>
-        <div class="day-label">Entrenamiento</div>
-      </div>
-      <div class="day-card">
-        <div class="day-name">Jueves</div>
-        <div class="day-label">Entrenamiento</div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<section class="cta-section">
-  <h2 class="cta-title">Sumate al entrenamiento</h2>
-  <p class="cta-sub">Escribinos y te contamos todo sobre horarios, lugar y cómo empezar.</p>
-  <a class="wa-button" href="https://wa.me/5492302351010?text=Hola%20quiero%20%2B%20info%20de%20la%20actividad" target="_blank" rel="noopener">
-    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15[...]"/></svg>
-    Más info
-  </a>
-</section>
-
-<footer>
-  Entrenamiento de Fútbol — Martes y Jueves
+<footer style="position:relative; z-index:3;">
+  Entrenamiento de Fútbol — Contacto por WhatsApp
 </footer>
 
 <script>
-  // Generar la grilla de luces del estadio (dot-matrix), evitando repetir a mano en el SVG
-  (function(){
-    const container = document.getElementById('dotsrow');
-    if(!container) return;
-    const ns = "http://www.w3.org/2000/svg";
-    let html = "";
-    for(let row=0; row<3; row++){
-      const y = 175 + row*22;
-      for(let col=0; col<40; col++){
-        const x = 10 + col*30 + (row%2===0?0:15);
-        html += `<circle cx="${x}" cy="${y}" r="2.2"></circle>`;
-      }
-    }
-    container.innerHTML = html;
-  })();
-</script>
+// Ball random movement across the pitch area
+(function(){
+  const ball = document.getElementById('ball-actor');
+  if(!ball) return;
 
-<script>
-  // Añadir conos y pelotas dispersas por la página
-  (function(){
-    const decor = document.getElementById('decor-container');
-    if(!decor) return;
+  function rand(min,max){ return Math.random()*(max-min)+min; }
 
-    const coneSVG = `
-      <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-        <defs>
-          <linearGradient id="g1" x1="0" x2="0" y1="0" y2="1">
-            <stop offset="0%" stop-color="#ffb84d" />
-            <stop offset="100%" stop-color="#ff7a1a" />
-          </linearGradient>
-        </defs>
-        <g>
-          <path d="M32 6 L50 54 L14 54 Z" fill="url(#g1)" stroke="#b35a00" stroke-width="1"/>
-          <rect x="22" y="44" width="20" height="4" fill="#8b3f00" opacity="0.6" transform="rotate(-12 32 46)"/>
-        </g>
-      </svg>
-    `;
+  // area where the ball can move (inside the visible pitch: bottom 48vh)
+  function getBounds(){
+    const height = window.innerHeight;
+    const pitchTop = height - (height * 0.48); // top of pitch-layer
+    const padding = 40; // keep some padding
+    return { left: 8, right: window.innerWidth - 56 - 8, top: pitchTop + padding, bottom: height - 56 - 8 };
+  }
 
-    const ballSVG = `
-      <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-        <circle cx="32" cy="32" r="28" fill="#fff" stroke="#000" stroke-width="1.5"/>
-        <g fill="#000">
-          <circle cx="32" cy="18" r="4"/>
-          <circle cx="22" cy="34" r="3.6"/>
-          <circle cx="44" cy="34" r="3.6"/>
-          <circle cx="32" cy="46" r="3.6"/>
-        </g>
-      </svg>
-    `;
+  function moveBall(){
+    const b = getBounds();
+    const x = rand(b.left, b.right);
+    const y = rand(b.top, b.bottom);
+    ball.style.left = x + 'px';
+    ball.style.top = y + 'px';
+    const scale = 0.9 + Math.random()*0.4;
+    const rot = Math.floor(Math.random()*60)-30;
+    ball.style.transform = `translate(0,0) rotate(${rot}deg) scale(${scale})`;
+  }
 
-    function placeDecor(){
-      // set container height to document's full height so absolute positions map across page
-      decor.style.height = document.body.scrollHeight + 'px';
-      // clear existing
-      decor.innerHTML = '';
-      const total = Math.max(6, Math.floor(document.body.scrollHeight / 700)); // more items on taller pages
-      for(let i=0;i<total;i++){
-        const type = Math.random() > 0.5 ? 'cone' : 'ball';
-        const el = document.createElement('div');
-        el.className = 'decor-item ' + type;
+  // Initial placement (below center)
+  function init(){
+    const w = window.innerWidth;
+    ball.style.left = Math.max(40, w/2 - 28) + 'px';
+    ball.style.top = (window.innerHeight - 120) + 'px';
+    // start moving every 2.5 - 5s
+    setTimeout(function(){
+      moveBall();
+      setInterval(moveBall, 3000 + Math.random()*2200);
+    }, 900);
+  }
 
-        const size = Math.floor(Math.random()*50) + 36; // 36 - 86 px
-        el.style.width = size + 'px';
-        el.style.height = size + 'px';
-
-        const left = Math.floor(Math.random()*85) + 5; // percent
-        const top = Math.floor(Math.random()*(document.body.scrollHeight - 80)) + 20; // px
-        const rot = Math.floor(Math.random()*60)-30;
-
-        el.style.left = left + '%';
-        el.style.top = top + 'px';
-        el.style.transform = `rotate(${rot}deg)`;
-
-        el.innerHTML = (type === 'cone') ? coneSVG : ballSVG;
-        decor.appendChild(el);
-      }
-    }
-
-    // initial placement
-    window.addEventListener('load', placeDecor);
-    // reposition on resize (heights change)
-    window.addEventListener('resize', function(){
-      // throttle
-      clearTimeout(window._decorTimer);
-      window._decorTimer = setTimeout(placeDecor, 220);
-    });
-  })();
+  window.addEventListener('load', init);
+  window.addEventListener('resize', function(){
+    clearTimeout(window._ballTimer);
+    window._ballTimer = setTimeout(moveBall, 300);
+  });
+})();
 </script>
 
 </body>
