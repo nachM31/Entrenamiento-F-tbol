@@ -9,13 +9,14 @@
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Barlow+Condensed:wght@500;600;700&family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root{
-    --pitch-dark: #071a12;
-    --pitch: #0f3d24;
-    --pitch-light: #1a5c37;
+    --pitch-dark: #0d5c2c;
+    --pitch: #1a7a3f;
+    --pitch-light: #2d9e52;
     --chalk: #f4f1e6;
     --floodlight: #ffd23f;
     --ink: #06120c;
     --line: rgba(244,241,230,0.16);
+    --white: #ffffff;
   }
 
   *{ box-sizing: border-box; margin:0; padding:0; }
@@ -24,9 +25,22 @@
 
   body{
     font-family: 'Barlow', sans-serif;
-    background: url('assets/stadium-background.jpg') center/cover fixed;
+    background: linear-gradient(180deg, #1a7a3f 0%, #2d9e52 50%, #1a7a3f 100%);
     color: var(--chalk);
     overflow-x: hidden;
+    position: relative;
+    min-height: 100vh;
+  }
+
+  /* Campo de fútbol SVG de fondo */
+  .football-pitch {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    pointer-events: none;
   }
 
   h1, h2, .eyebrow, .stat-num{
@@ -37,6 +51,7 @@
   /* ---------- HERO / STADIUM ---------- */
   .hero{
     position: relative;
+    z-index: 3;
     min-height: 100svh;
     display: flex;
     align-items: center;
@@ -111,8 +126,9 @@
   /* ---------- CONTENT ---------- */
   .section{
     position: relative;
+    z-index: 3;
     padding: 80px 24px;
-    background: rgba(6,18,12,0.8);
+    background: rgba(6,18,12,0.6);
   }
 
   .section::before{
@@ -184,7 +200,7 @@
 
   /* ---------- DAYS ---------- */
   .days-section{
-    background: rgba(6,18,12,0.8);
+    background: rgba(6,18,12,0.6);
   }
 
   .days-grid{
@@ -197,8 +213,8 @@
 
   .day-card{
     position: relative;
-    background: var(--pitch-dark);
-    border: 1px solid var(--line);
+    background: rgba(13,92,44,0.7);
+    border: 1px solid rgba(244,241,230,0.3);
     border-radius: 16px;
     padding: 28px 18px;
     text-align: center;
@@ -234,7 +250,7 @@
   .cta-section{
     padding: 90px 24px 100px;
     text-align: center;
-    background: rgba(6,18,12,0.8);
+    background: rgba(6,18,12,0.6);
   }
 
   .cta-title{
@@ -278,11 +294,13 @@
   .wa-button svg{ width: 24px; height: 24px; flex-shrink: 0; }
 
   footer{
+    position: relative;
+    z-index: 3;
     text-align: center;
     padding: 26px;
     font-size: 0.8rem;
     color: rgba(244,241,230,0.35);
-    background: rgba(6,18,12,0.95);
+    background: rgba(6,18,12,0.8);
   }
 
   @media (max-width: 480px){
@@ -292,6 +310,62 @@
 </style>
 </head>
 <body>
+
+<!-- Campo de fútbol SVG -->
+<svg class="football-pitch" viewBox="0 0 1200 2400" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <defs>
+    <!-- Patrón de franjas horizontales -->
+    <pattern id="stripes" x="0" y="0" width="1200" height="40" patternUnits="userSpaceOnUse">
+      <rect x="0" y="0" width="1200" height="20" fill="#1a7a3f"/>
+      <rect x="0" y="20" width="1200" height="20" fill="#2d9e52"/>
+    </pattern>
+  </defs>
+
+  <!-- Fondo del campo con franjas -->
+  <rect width="1200" height="2400" fill="url(#stripes)"/>
+
+  <!-- Arco inicial (superior) -->
+  <g stroke="white" stroke-width="8" fill="none">
+    <!-- Portería -->
+    <line x1="400" y1="80" x2="400" y2="240"/>
+    <line x1="800" y1="80" x2="800" y2="240"/>
+    <line x1="400" y1="80" x2="800" y2="80"/>
+    <!-- Línea de meta -->
+    <line x1="200" y1="120" x2="1000" y2="120"/>
+    <!-- Área pequeña -->
+    <rect x="450" y="120" width="300" height="180" fill="none"/>
+    <!-- Área grande -->
+    <rect x="300" y="120" width="600" height="360" fill="none"/>
+  </g>
+
+  <!-- Línea de medio campo -->
+  <line x1="200" y1="1200" x2="1000" y2="1200" stroke="white" stroke-width="8"/>
+  
+  <!-- Círculo central -->
+  <circle cx="600" cy="1200" r="100" stroke="white" stroke-width="8" fill="none"/>
+  <circle cx="600" cy="1200" r="6" fill="white"/>
+
+  <!-- Líneas laterales -->
+  <line x1="200" y1="120" x2="200" y2="2280" stroke="white" stroke-width="8"/>
+  <line x1="1000" y1="120" x2="1000" y2="2280" stroke="white" stroke-width="8"/>
+
+  <!-- Línea de meta inferior -->
+  <line x1="200" y1="2280" x2="1000" y2="2280" stroke="white" stroke-width="8"/>
+
+  <!-- Arco final (inferior) -->
+  <g stroke="white" stroke-width="8" fill="none">
+    <!-- Portería -->
+    <line x1="400" y1="2160" x2="400" y2="2320"/>
+    <line x1="800" y1="2160" x2="800" y2="2320"/>
+    <line x1="400" y1="2320" x2="800" y2="2320"/>
+    <!-- Línea de meta -->
+    <line x1="200" y1="2280" x2="1000" y2="2280"/>
+    <!-- Área pequeña -->
+    <rect x="450" y="2100" width="300" height="180" fill="none"/>
+    <!-- Área grande -->
+    <rect x="300" y="1920" width="600" height="360" fill="none"/>
+  </g>
+</svg>
 
 <section class="hero">
   <div class="hero-content">
